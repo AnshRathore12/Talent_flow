@@ -2,34 +2,6 @@
   "root": "dist",
   "clean_urls": false,
   "routes": {
-    "/*.js": {
-      "headers": {
-        "Content-Type": "application/javascript; charset=utf-8",
-        "Cache-Control": "no-cache"
-      }
-    },
-    "/*.mjs": {
-      "headers": {
-        "Content-Type": "application/javascript; charset=utf-8",
-        "Cache-Control": "no-cache"
-      }
-    },
-    "/*.css": {
-      "headers": {
-        "Content-Type": "text/css; charset=utf-8"
-      }
-    },
-    "/assets/*.js": {
-      "headers": {
-        "Content-Type": "application/javascript; charset=utf-8",
-        "Cache-Control": "no-cache"
-      }
-    },
-    "/assets/*.css": {
-      "headers": {
-        "Content-Type": "text/css; charset=utf-8"
-      }
-    },
     "/**": "index.html"
   },
   "error_page": "index.html",
@@ -38,6 +10,38 @@
       "X-Frame-Options": "DENY",
       "X-XSS-Protection": "1; mode=block",
       "X-Content-Type-Options": "nosniff"
+    },
+    "/*.js": {
+      "Content-Type": "application/javascript; charset=utf-8",
+      "Cache-Control": "no-cache"
+    },
+    "/**/*.js": {
+      "Content-Type": "application/javascript; charset=utf-8",
+      "Cache-Control": "no-cache"
+    },
+    "/*.mjs": {
+      "Content-Type": "application/javascript; charset=utf-8",
+      "Cache-Control": "no-cache"
+    },
+    "/**/*.mjs": {
+      "Content-Type": "application/javascript; charset=utf-8",
+      "Cache-Control": "no-cache"
+    },
+    "/*.css": {
+      "Content-Type": "text/css; charset=utf-8",
+      "Cache-Control": "no-cache"
+    },
+    "/**/*.css": {
+      "Content-Type": "text/css; charset=utf-8",
+      "Cache-Control": "no-cache"
+    },
+    "/assets/*.js": {
+      "Content-Type": "application/javascript; charset=utf-8",
+      "Cache-Control": "no-cache"
+    },
+    "/assets/*.css": {
+      "Content-Type": "text/css; charset=utf-8",
+      "Cache-Control": "no-cache"
     }
   }
 }

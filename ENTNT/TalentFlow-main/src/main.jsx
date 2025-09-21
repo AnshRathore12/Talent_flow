@@ -14,10 +14,10 @@ makeServer({
   environment: import.meta.env.PROD ? 'production' : 'development' 
 })
 
-// Also start a specialized MirageJS instance for MIME type handling in production
-if (import.meta.env.PROD) {
-  setupMirageJSForProduction();
-}
+// Always start the specialized MirageJS instance for MIME type handling
+// This ensures JavaScript modules are served with the correct MIME type
+// This is a pure client-side solution - no Express or Node.js server required
+setupMirageJSForProduction();
 
 // Initialize database and seed data only if empty
 seedData().then(async () => {

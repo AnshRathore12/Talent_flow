@@ -1,15 +1,9 @@
 services:
   - type: web
     name: talentflow
-    env: node
+    env: static
     buildCommand: npm install && npm run build
-    startCommand: npm start
-    rootDir: ENTNT/TalentFlow-main
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: PORT
-        value: 10000
+    staticPublishPath: ./dist
     headers:
       - path: "/assets/*.js"
         name: Content-Type
@@ -18,6 +12,17 @@ services:
         name: Content-Type
         value: application/javascript; charset=utf-8
       - path: "/**.js"
+        name: Content-Type
+        value: application/javascript; charset=utf-8
+      - path: "/*.mjs"
+        name: Content-Type
+        value: application/javascript; charset=utf-8
+      - path: "/**.mjs"
+        name: Content-Type
+        value: application/javascript; charset=utf-8
+      - path: "/*"
+        name: X-Content-Type-Options
+        value: nosniff
         name: Content-Type
         value: application/javascript; charset=utf-8
       - path: "*.js"
