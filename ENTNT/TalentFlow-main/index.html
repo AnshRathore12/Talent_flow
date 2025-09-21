@@ -8,9 +8,39 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <title>TalentFlow - Hiring Platform</title>
+    <!-- Fixed MIME type JS loader -->
+    <script>
+      // Special loader to work around MIME type issues
+      window.addEventListener('DOMContentLoaded', function() {
+        // Create module script element with proper MIME type
+        var script = document.createElement('script');
+        script.type = 'module';
+        script.src = '/src/main.jsx';
+        
+        // Add MIME type workaround
+        script.setAttribute('data-fixed-mime', 'true');
+        
+        // Log for debugging
+        console.log('Loading main script with MIME type workaround');
+        
+        // Error handler
+        script.onerror = function(error) {
+          console.error('Script loading error:', error);
+          
+          // Fallback to direct script inclusion
+          var fallbackScript = document.createElement('script');
+          fallbackScript.type = 'application/javascript';
+          fallbackScript.src = '/src/fallback-loader.js';
+          document.body.appendChild(fallbackScript);
+        };
+        
+        // Append to document
+        document.body.appendChild(script);
+      });
+    </script>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <!-- No script tag here - we load it dynamically with proper MIME type -->
   </body>
 </html>

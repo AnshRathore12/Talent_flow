@@ -23,6 +23,12 @@ const ensureMimeTypes = () => {
         fs.copyFileSync('./public/mime-sw.js', './dist/mime-sw.js');
         console.log('Copied mime-sw.js to output directory');
       }
+      
+      // Copy custom index file as the main index.html
+      if (fs.existsSync('./custom-index.html')) {
+        fs.copyFileSync('./custom-index.html', './dist/index.html');
+        console.log('Using custom index.html with MIME type fixes');
+      }
     }
   };
 };
@@ -53,23 +59,12 @@ export default defineConfig({
     rollupOptions: {
       output: {
         // Ensure JS assets have proper extensions and naming
-        entryFileNames: 'assets/[name]-[hash].js',
-        chunkFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]'
+        entryFileNames: 'assets/index.js',
+        chunkFileNames: 'assets/[name].js',
+        assetFileNames: 'assets/[name].[ext]'
       }
     },
     // Add special metadata for MIME types
-    assetsInlineLimit: 0, // Don't inline assets to ensure proper MIME types
-    assetsDir: 'assets',
-    sourcemap: false,
-    minify: 'terser',
-    rollupOptions: {
-      output: {
-        manualChunks: undefined,
-        entryFileNames: 'assets/[name]-[hash].js',
-        chunkFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]'
-      },
-    },
-  },
-})
+    assetsInlineLimit: 0 // Don't inline assets to ensure proper MIME types
+  }
+});

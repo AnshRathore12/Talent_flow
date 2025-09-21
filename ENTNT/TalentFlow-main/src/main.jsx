@@ -14,6 +14,36 @@ makeServer({
   environment: import.meta.env.PROD ? 'production' : 'development' 
 })
 
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { BrowserRouter } from 'react-router-dom'
+import { Toaster } from 'react-hot-toast'
+import App from './App.jsx'
+import './index.css'
+import { makeServer } from './server'
+import { setupMirageJSForProduction } from './mimeHandlerMirage'
+import { seedData } from './lib/database'
+// Import MIME type configuration early - critical for module loading
+import './mime-config.js'
+
+// Try to prevent MIME type issues with early detection
+const handleMimeTypeIssues = () => {
+  console.log('Setting up MIME type handling in main.jsx');
+  // Register service worker for MIME handling if needed
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/mime-sw.js')
+      .then(registration => {
+        console.log('MIME Service Worker registered from main.jsx');
+      })
+      .catch(err => {
+        console.error('Service worker registration failed:', err);
+      });
+  }
+};
+
+// Run MIME type handling early
+handleMimeTypeIssues();
+
 // Always start the specialized MirageJS instance for MIME type handling
 // This ensures JavaScript modules are served with the correct MIME type
 // This is a pure client-side solution - no Express or Node.js server required
