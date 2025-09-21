@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: talentflow
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    rootDir: ENTNT/TalentFlow-main
+    envVars:
+      - key: NODE_ENV
+        value: production
+    headers:
+      - path: "/*.js"
+        name: Content-Type
+        value: application/javascript; charset=utf-8
+      - path: "/*.mjs"
+        name: Content-Type
+        value: application/javascript; charset=utf-8
+      - path: "/*.css"
+        name: Content-Type
+        value: text/css; charset=utf-8
