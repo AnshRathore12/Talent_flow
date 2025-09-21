@@ -7,10 +7,11 @@ import './index.css'
 import { makeServer } from './server'
 import { seedData } from './lib/database'
 
-// Start Mirage server in development
-if (import.meta.env.DEV) {
-  makeServer({ environment: 'development' })
-}
+// Start Mirage server in both development and production
+// In production, this will handle both API mocking and static file serving
+makeServer({ 
+  environment: import.meta.env.PROD ? 'production' : 'development' 
+})
 
 // Initialize database and seed data only if empty
 seedData().then(async () => {

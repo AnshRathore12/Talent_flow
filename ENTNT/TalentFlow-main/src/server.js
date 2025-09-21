@@ -678,6 +678,29 @@ export function makeServer({ environment = 'development' } = {}) {
           return new Response(500, {}, { error: 'Failed to delete assessment' });
         }
       });
+
+      // Static file handling for production deployment
+      this.passthrough('/**/*.js');
+      this.passthrough('/**/*.mjs');
+      this.passthrough('/**/*.css');
+      this.passthrough('/**/*.html');
+      this.passthrough('/**/*.svg');
+      this.passthrough('/**/*.png');
+      this.passthrough('/**/*.jpg');
+      this.passthrough('/**/*.jpeg');
+      this.passthrough('/**/*.gif');
+      this.passthrough('/**/*.ico');
+      this.passthrough('/**/*.woff');
+      this.passthrough('/**/*.woff2');
+      this.passthrough('/**/*.ttf');
+      this.passthrough('/**/*.eot');
+      this.passthrough('/assets/**');
+      this.passthrough('/mockServiceWorker.js');
+      this.passthrough('/vite.svg');
+
+      // Handle all other routes for SPA routing
+      this.passthrough('/');
+      this.passthrough();
     }
   });
 }

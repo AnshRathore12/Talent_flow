@@ -8,6 +8,8 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 10000
     headers:
       - path: "/assets/*.js"
         name: Content-Type
