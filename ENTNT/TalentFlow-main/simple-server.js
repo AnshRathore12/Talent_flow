@@ -32,7 +32,12 @@ const server = createServer((req, res) => {
   
   try {
     const ext = extname(filePath).toLowerCase();
-    const mimeType = mimeTypes[ext] || 'application/octet-stream';
+    let mimeType = mimeTypes[ext] || 'application/octet-stream';
+    
+    // Extra enforcement for JavaScript modules - critical for ES modules
+    if (ext === '.js' || ext === '.mjs') {
+      mimeType = 'application/javascript; charset=utf-8';
+    }
     
     console.log(`Serving: ${req.url} -> ${filePath}, MIME: ${mimeType}`);
     
@@ -41,7 +46,8 @@ const server = createServer((req, res) => {
     res.writeHead(200, {
       'Content-Type': mimeType,
       'Cache-Control': 'no-cache',
-      'Access-Control-Allow-Origin': '*'
+      'Access-Control-Allow-Origin': '*',
+      'X-Content-Type-Options': 'nosniff'
     });
     
     res.end(content);

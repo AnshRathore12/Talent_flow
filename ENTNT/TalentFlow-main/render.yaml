@@ -9,12 +9,18 @@ services:
       - key: NODE_ENV
         value: production
     headers:
-      - path: "/*.js"
+      - path: "/assets/*.js"
         name: Content-Type
         value: application/javascript; charset=utf-8
-      - path: "/*.mjs"
+      - path: "*.js"
         name: Content-Type
         value: application/javascript; charset=utf-8
-      - path: "/*.css"
+      - path: "*.mjs"
+        name: Content-Type
+        value: application/javascript; charset=utf-8
+      - path: "/assets/*.css"
+        name: Content-Type
+        value: text/css; charset=utf-8
+      - path: "*.css"
         name: Content-Type
         value: text/css; charset=utf-8

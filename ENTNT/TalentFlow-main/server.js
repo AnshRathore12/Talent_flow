@@ -9,15 +9,31 @@ const __dirname = dirname(__filename);
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Force MIME types for all JavaScript files
-app.use('/assets/*.js', (req, res, next) => {
-  res.type('application/javascript');
+// Force MIME types for all JavaScript files - more specific middleware
+app.use('/assets', (req, res, next) => {
+  const url = req.url;
+  if (url.endsWith('.js') || url.endsWith('.mjs')) {
+    res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+    console.log(`Setting JS MIME type for: ${req.originalUrl}`);
+  } else if (url.endsWith('.css')) {
+    res.setHeader('Content-Type', 'text/css; charset=utf-8');
+    console.log(`Setting CSS MIME type for: ${req.originalUrl}`);
+  }
   next();
 });
 
-// Force MIME types for CSS files
-app.use('/assets/*.css', (req, res, next) => {
-  res.type('text/css');
+// Explicit route for JavaScript files to ensure MIME type
+app.get('*.js', (req, res, next) => {
+  res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-cache');
+  console.log(`Explicit JS handler for: ${req.originalUrl}`);
+  next();
+});
+
+app.get('*.mjs', (req, res, next) => {
+  res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-cache');
+  console.log(`Explicit MJS handler for: ${req.originalUrl}`);
   next();
 });
 
@@ -50,15 +66,16 @@ app.use(express.static(join(__dirname, 'dist'), {
     
     console.log(`Serving: ${filePath}, Extension: ${ext}, MIME: ${mimeType}`);
     
-    if (mimeType) {
-      res.setHeader('Content-Type', mimeType);
-    }
-    
-    // Force JavaScript MIME type for any .js files
+    // Force JavaScript MIME type for any .js files - CRITICAL for ES modules
     if (ext === '.js' || ext === '.mjs') {
       res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
       res.setHeader('Cache-Control', 'no-cache');
-      console.log('Set JavaScript MIME type for:', filePath);
+      // Ensure no other content-type headers interfere
+      res.removeHeader('content-type'); // Remove any existing content-type
+      res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+      console.log('FORCED JavaScript MIME type for:', filePath);
+    } else if (mimeType) {
+      res.setHeader('Content-Type', mimeType);
     }
   },
   etag: false,
