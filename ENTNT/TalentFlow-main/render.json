@@ -1,0 +1,44 @@
+{
+  "services": [
+    {
+      "type": "web",
+      "name": "talentflow",
+      "env": "node",
+      "buildCommand": "npm install && npm run build",
+      "startCommand": "npm start",
+      "envVars": [
+        {
+          "key": "NODE_ENV",
+          "value": "production"
+        }
+      ],
+      "headers": [
+        {
+          "path": "/assets/*.js",
+          "name": "Content-Type",
+          "value": "application/javascript; charset=utf-8"
+        },
+        {
+          "path": "*.js",
+          "name": "Content-Type",
+          "value": "application/javascript; charset=utf-8"
+        },
+        {
+          "path": "*.mjs",
+          "name": "Content-Type",
+          "value": "application/javascript; charset=utf-8"
+        },
+        {
+          "path": "/assets/*.css",
+          "name": "Content-Type",
+          "value": "text/css; charset=utf-8"
+        },
+        {
+          "path": "*.css",
+          "name": "Content-Type",
+          "value": "text/css; charset=utf-8"
+        }
+      ]
+    }
+  ]
+}
