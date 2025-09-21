@@ -1,59 +1,39 @@
 {
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": "dist/**"
-      }
-    }
-  ],
+  "version": 2,
+  "framework": "vite",
+  "outputDirectory": "dist",
+  "buildCommand": "npm run build",
   "routes": [
-    {
-      "src": "/assets/(.*)\\.js$",
-      "dest": "/assets/$1.js",
-      "headers": {
+    { 
+      "src": "/assets/(.*)\\.js", 
+      "headers": { 
         "Content-Type": "application/javascript; charset=utf-8",
-        "Cache-Control": "no-cache"
-      }
+        "Cache-Control": "no-cache",
+        "X-Content-Type-Options": "nosniff"
+      }, 
+      "continue": true
     },
-    {
-      "src": "/assets/(.*)\\.mjs$",
-      "dest": "/assets/$1.mjs", 
-      "headers": {
+    { 
+      "src": "/(.*)\\.js", 
+      "headers": { 
         "Content-Type": "application/javascript; charset=utf-8",
-        "Cache-Control": "no-cache"
-      }
+        "Cache-Control": "no-cache",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "continue": true
     },
-    {
-      "src": "/assets/(.*)\\.css$",
-      "dest": "/assets/$1.css",
-      "headers": {
+    { 
+      "src": "/(.*)\\.css", 
+      "headers": { 
         "Content-Type": "text/css; charset=utf-8"
-      }
+      },
+      "continue": true
     },
     {
-      "src": "/(.*)\\.js$",
-      "dest": "/$1.js",
-      "headers": {
-        "Content-Type": "application/javascript; charset=utf-8",
-        "Cache-Control": "no-cache"
-      }
+      "handle": "filesystem"
     },
     {
-      "src": "/(.*)\\.mjs$",
-      "dest": "/$1.mjs",
-      "headers": {
-        "Content-Type": "application/javascript; charset=utf-8",
-        "Cache-Control": "no-cache"
-      }
-    },
-    {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
-    },
-    {
-      "src": "/(.*)",
+      "src": "/.*",
       "dest": "/index.html"
     }
   ],
@@ -62,45 +42,10 @@
       "source": "/(.*)",
       "headers": [
         {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        },
-        {
-          "key": "X-XSS-Protection", 
-          "value": "1; mode=block"
-        },
-        {
           "key": "X-Content-Type-Options",
           "value": "nosniff"
         }
       ]
-    },
-    {
-      "source": "**/*.js",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/javascript; charset=utf-8"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "no-cache"
-        }
-      ]
-    },
-    {
-      "source": "**/*.mjs",
-      "headers": [
-        {
-          "key": "Content-Type", 
-          "value": "application/javascript; charset=utf-8"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "no-cache"
-        }
-      ]
     }
-  ],
-  "outputDirectory": "dist"
+  ]
 }
