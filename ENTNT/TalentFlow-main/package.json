@@ -8,7 +8,8 @@
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "start": "node server.js"
+    "start": "node server.js",
+    "start:simple": "node simple-server.js"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",
