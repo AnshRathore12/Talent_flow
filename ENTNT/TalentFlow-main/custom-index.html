@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="./vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <title>TalentFlow - Hiring Platform</title>
     <style>
       /* Add some basic styling */
@@ -35,75 +37,177 @@
         100% { transform: rotate(360deg); }
       }
     </style>
-    <!-- MIME type workaround -->
-    <script>
-      // Function to load the app with correct MIME type
-      function loadApp() {
-        // Initial loading state
-        window.appState = 'loading';
-        console.log('Starting TalentFlow app with MIME type fix');
-
-        // Function to dynamically load a script with correct MIME type
-        function loadScript(src, type = 'module') {
-          return new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.type = type;
-            script.src = src;
-            script.onload = resolve;
-            script.onerror = (e) => {
-              console.error(`Failed to load script: ${src}`, e);
-              reject(e);
-            };
-            document.head.appendChild(script);
-          });
+    <!-- Create a base module to ensure proper loading -->
+    <script type="application/javascript">
+      // Global loader tracker
+      window._scriptLoaded = false;
+      window._loadingAttempts = 0;
+      window._maxAttempts = 3;
+      
+      // Function to load the app with proper MIME type handling
+      window.loadApp = function() {
+        // Prevent multiple executions
+        if (window._scriptLoaded) return;
+        window._loadingAttempts++;
+        
+        console.log(`Starting TalentFlow app load attempt ${window._loadingAttempts}`);
+        
+        // Check for previous React loading
+        if (window.React) {
+          console.log('React already loaded, will skip React import');
         }
+        
+        // Determine asset paths
+        const paths = [
+          './assets/index.js',  // Production build asset
+          './src/main.jsx'      // Development source
+        ];
 
-        // Try direct loading first
-        loadScript('./assets/index.js')
-          .then(() => {
-            console.log('App loaded successfully via direct script tag');
-            window.appState = 'loaded';
-          })
-          .catch(error => {
-            console.warn('Direct loading failed, trying fetch method', error);
+        // Attempt to load script with correct MIME type
+        function attemptLoad(index = 0) {
+          if (index >= paths.length || window._scriptLoaded) {
+            if (!window._scriptLoaded) {
+              console.log('All direct loading paths failed, trying fetch approach');
+              loadViaFetch();
+            }
+            return;
+          }
+          
+          const path = paths[index];
+          console.log(`Trying to load from: ${path}`);
+          
+          const script = document.createElement('script');
+          script.type = 'module';
+          script.setAttribute('data-fixed-mime', 'true'); 
+          script.src = path;
+          
+          script.onload = () => {
+            console.log(`Script loaded successfully from ${path}`);
+            window._scriptLoaded = true;
+            document.getElementById('loading-text').textContent = 'Application loaded!';
             
-            // Try fetch method to control MIME type
-            fetch('./assets/index.js')
-              .then(response => response.text())
-              .then(scriptText => {
-                // Create script with proper MIME type
-                const blob = new Blob([scriptText], { 
-                  type: 'application/javascript; charset=utf-8' 
-                });
-                const scriptUrl = URL.createObjectURL(blob);
-                
-                // Create and execute script
-                const script = document.createElement('script');
-                script.type = 'module';
-                script.src = scriptUrl;
-                script.onload = () => {
-                  console.log('App loaded successfully via fetch/blob');
-                  window.appState = 'loaded';
-                };
-                script.onerror = (e) => {
-                  console.error('Fetch/blob loading failed', e);
-                  window.appState = 'error';
-                  document.getElementById('loading-text').textContent = 
-                    'Failed to load application. Please check console for errors.';
-                };
-                document.head.appendChild(script);
+            // Hide loading spinner after a delay
+            setTimeout(() => {
+              const spinner = document.querySelector('.loading-container');
+              if (spinner) spinner.style.display = 'none';
+            }, 500);
+          };
+          
+          script.onerror = () => {
+            console.warn(`Failed to load from ${path}, trying next option`);
+            attemptLoad(index + 1);
+          };
+          
+          document.head.appendChild(script);
+        }
+        
+        // Fetch and load with explicit MIME type
+        function loadViaFetch() {
+          console.log('Attempting to load via fetch with explicit MIME type');
+          
+          // Try different paths
+          Promise.all(paths.map(path => 
+            fetch(path)
+              .then(response => {
+                if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+                return { path, response };
               })
               .catch(error => {
-                console.error('All loading methods failed', error);
-                window.appState = 'error';
+                console.warn(`Fetch failed for ${path}:`, error);
+                return null;
+              })
+          ))
+          .then(results => {
+            // Find first successful fetch
+            const result = results.find(r => r !== null);
+            if (!result) {
+              fallbackToInlineScript();
+              return;
+            }
+            
+            return result.response.text().then(scriptText => {
+              // Handle React import conflict
+              if (window.React && scriptText.includes('import React from')) {
+                scriptText = scriptText.replace(
+                  /import\s+React\s+from\s+['"]react['"]/g, 
+                  '// React already loaded - skipping import'
+                );
+              }
+              
+              // Create blob with proper MIME type
+              const blob = new Blob([scriptText], { 
+                type: 'application/javascript; charset=utf-8' 
+              });
+              const scriptUrl = URL.createObjectURL(blob);
+              
+              // Create and load the script
+              const script = document.createElement('script');
+              script.type = 'module';
+              script.src = scriptUrl;
+              
+              script.onload = () => {
+                console.log('App loaded successfully via fetch/blob');
+                window._scriptLoaded = true;
+                document.getElementById('loading-text').textContent = 'Application loaded!';
+                
+                // Hide loading spinner after a delay
+                setTimeout(() => {
+                  const spinner = document.querySelector('.loading-container');
+                  if (spinner) spinner.style.display = 'none';
+                }, 500);
+              };
+              
+              script.onerror = fallbackToInlineScript;
+              document.head.appendChild(script);
+            });
+          })
+          .catch(fallbackToInlineScript);
+        }
+        
+        // Ultimate fallback - service worker
+        function fallbackToInlineScript() {
+          console.log('All loading methods failed, checking for service worker support');
+          
+          if ('serviceWorker' in navigator) {
+            console.log('Attempting to register MIME fixing service worker');
+            
+            navigator.serviceWorker.register('./mime-sw.js')
+              .then(registration => {
+                console.log('ServiceWorker registered:', registration);
+                
+                // Try direct script load again after service worker is active
+                registration.active.postMessage({
+                  type: 'READY_FOR_SCRIPT_LOAD'
+                });
+                
+                // Reload the page to use the service worker
+                if (window._loadingAttempts < window._maxAttempts) {
+                  console.log('Reloading page to use service worker');
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 1000);
+                } else {
+                  document.getElementById('loading-text').textContent = 
+                    'Unable to load application. Please try a different browser.';
+                }
+              })
+              .catch(error => {
+                console.error('Service worker registration failed:', error);
                 document.getElementById('loading-text').textContent = 
                   'Failed to load application. Please check console for errors.';
               });
-          });
-      }
-
+          } else {
+            document.getElementById('loading-text').textContent = 
+              'This browser may not be compatible with this application.';
+          }
+        }
+        
+        // Start the loading process
+        attemptLoad();
+      };
+      
       // Execute loader on DOMContentLoaded
-      document.addEventListener('DOMContentLoaded', loadApp);
+      document.addEventListener('DOMContentLoaded', window.loadApp);
     </script>
   </head>
   <body>
