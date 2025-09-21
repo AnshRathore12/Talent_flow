@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast'
 import App from './App.jsx'
 import './index.css'
 import { makeServer } from './server'
+import { setupMirageJSForProduction } from './mimeHandlerMirage'
 import { seedData } from './lib/database'
 
 // Start Mirage server in both development and production
@@ -12,6 +13,11 @@ import { seedData } from './lib/database'
 makeServer({ 
   environment: import.meta.env.PROD ? 'production' : 'development' 
 })
+
+// Also start a specialized MirageJS instance for MIME type handling in production
+if (import.meta.env.PROD) {
+  setupMirageJSForProduction();
+}
 
 // Initialize database and seed data only if empty
 seedData().then(async () => {
